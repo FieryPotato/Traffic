@@ -22,7 +22,7 @@ MILE_LENGTH: int = 40
 
 class PenUp:
     """
-    Context manager for movements during which time pen should be up.
+    Context manager to automate putting pen up and down for movement.
     """
 
     def __enter__(self) -> "PenUp":
@@ -76,10 +76,13 @@ def random_acid() -> str:
 
 def generate_aircraft(heading_0: float, heading_1: float) -> tuple[namedtuple, namedtuple]:
     alt_0, alt_1 = random_altitudes()
+
     craft_0 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES),
                        heading=heading_0, altitude=alt_0, speed=25)
+
     craft_1 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES),
                        heading=heading_1, altitude=alt_1, speed=25)
+
     return craft_0, craft_1
 
 
@@ -113,21 +116,25 @@ def place_pps(aircraft_list: tuple) -> None:
     distance = random.randint(40, 170)
     parities = [1, -1]
     parity = random.choice(parities)
+
     for i, aircraft in enumerate(aircraft_list):
         if i == 1:
             if abs(aircraft_list[0].heading - aircraft_list[1].heading) <= 30:
                 parity = 1 if parity == -1 else -1
             else:
                 parity = random.choice(parities)
+
         with KeepPos():
             modified_distance = parity * distance
             with PenUp():
                 turtle.setheading(aircraft.heading)
                 turtle.forward(modified_distance)
+
+            draw_pps()
             tag = f"{aircraft.acid}\n" \
                   f"{aircraft.type}\n" \
                   f"{aircraft.altitude}    {aircraft.speed}"
-            draw_pps()
+
             with PenUp():
                 turtle.forward(parity * (RADIUS / 4))
                 turtle.write(tag)
@@ -162,21 +169,23 @@ def draw_scale() -> None:
     """
     tick_length = 10
     scale_start = (-RADIUS, RADIUS)
+
     with KeepPos():
         with PenUp():
             turtle.goto(scale_start)
             turtle.setheading(360)
 
+        # draw the bracket shape
         turtle.forward(tick_length)
         turtle.setheading(90)
         turtle.forward(MILE_LENGTH)
         turtle.setheading(180)
         turtle.forward(tick_length)
+
         with PenUp():
             turtle.goto(scale_start[0] + MILE_LENGTH / 2, scale_start[1] + 10)
+
         turtle.write("1 MILE", align="center")
-
-
 
 
 def initialize() -> None:
