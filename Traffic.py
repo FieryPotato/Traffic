@@ -17,6 +17,7 @@ HEADING_RANGE: tuple[float, float] = (0, 179.9999)
 
 PPS_SIDE: int = 10
 RADIUS: int = 270
+MILE_LENGTH: int = 40
 
 
 class PenUp:
@@ -155,6 +156,29 @@ def draw_pps() -> None:
             turtle.forward(triangle_side)
 
 
+def draw_scale() -> None:
+    """
+    Draw a scale for 1 mile.
+    """
+    tick_length = 10
+    scale_start = (-RADIUS, RADIUS)
+    with KeepPos():
+        with PenUp():
+            turtle.goto(scale_start)
+            turtle.setheading(360)
+
+        turtle.forward(tick_length)
+        turtle.setheading(90)
+        turtle.forward(MILE_LENGTH)
+        turtle.setheading(180)
+        turtle.forward(tick_length)
+        with PenUp():
+            turtle.goto(scale_start[0] + MILE_LENGTH / 2, scale_start[1] + 10)
+        turtle.write("1 MILE", align="center")
+
+
+
+
 def initialize() -> None:
     """
     Set up turtle for drawing what's needed.
@@ -180,6 +204,7 @@ def draw(*args) -> None:
     """
     reset()
     draw_circle()
+    draw_scale()
     headings = random.uniform(*HEADING_RANGE), random.uniform(*HEADING_RANGE)
     draw_lines(*headings)
     place_pps(generate_aircraft(*headings))
