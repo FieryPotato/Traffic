@@ -7,6 +7,7 @@ Aircraft: namedtuple = namedtuple("Aircraft", "acid, type, heading, altitude, sp
 
 CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA", "WJA",
                         "UAL", "CRQ", "DAL", "GLR"]
+
 PLANE_TYPES: list[str] = ["A320", "B190", "B747", "CRJ9", "B737"]
 
 # Lowest altitude, highest altitude - 10
