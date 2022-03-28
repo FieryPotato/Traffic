@@ -15,6 +15,7 @@ ALTITUDE_RANGE: tuple[int, int] = (90, 290)
 
 HEADING_RANGE: tuple[float, float] = (0, 179.9999)
 
+PARITIES = [1, -1]
 PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
@@ -24,7 +25,6 @@ class PenUp:
     """
     Context manager to automate putting pen up and down for movement.
     """
-
     def __enter__(self) -> "PenUp":
         turtle.penup()
         return self
@@ -108,21 +108,20 @@ def draw_lines(heading_0, heading_1) -> None:
             turtle.backward(2 * RADIUS)
 
 
-def place_pps(aircraft_list: tuple) -> None:
+def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
     """
     Place a PPS on each of the lines defined by two-member tuple of
     Aircraft at the same distance from the centre.
     """
     distance = random.randint(40, 170)
-    parities = [1, -1]
-    parity = random.choice(parities)
+    parity = random.choice(PARITIES)
 
     for i, aircraft in enumerate(aircraft_list):
         if i == 1:
             if abs(aircraft_list[0].heading - aircraft_list[1].heading) <= 30:
                 parity = 1 if parity == -1 else -1
             else:
-                parity = random.choice(parities)
+                parity = random.choice(PARITIES)
 
         with KeepPos():
             modified_distance = parity * distance
@@ -131,6 +130,7 @@ def place_pps(aircraft_list: tuple) -> None:
                 turtle.forward(modified_distance)
 
             draw_pps()
+
             tag = f"{aircraft.acid}\n" \
                   f"{aircraft.type}\n" \
                   f"{aircraft.altitude}    {aircraft.speed}"
@@ -190,7 +190,7 @@ def draw_scale() -> None:
 
 def initialize() -> None:
     """
-    Set up turtle for drawing what's needed.
+    Run initial setup for turtle.
     """
     turtle.mode('logo')
     turtle.hideturtle()
@@ -213,10 +213,10 @@ def draw(*args) -> None:
     """
     reset()
     draw_circle()
-    draw_scale()
     headings = random.uniform(*HEADING_RANGE), random.uniform(*HEADING_RANGE)
     draw_lines(*headings)
     place_pps(generate_aircraft(*headings))
+    draw_scale()
 
 
 def main() -> None:
