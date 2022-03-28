@@ -3,26 +3,31 @@ import random
 from collections import namedtuple
 from math import sqrt
 
-Aircraft = namedtuple("Aircraft", "acid, type, heading, altitude")
+Aircraft: namedtuple = namedtuple("Aircraft", "acid, type, heading, altitude, speed")
 
-CALLSIGNS = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA", "WJA",
-             "UAL", "CRQ", "DAL", "GLR"]
+CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA", "WJA",
+                        "UAL", "CRQ", "DAL", "GLR"]
+PLANE_TYPES: list[str] = ["A320", "B190", "B747", "CRJ9", "B737"]
 
-PLANE_TYPES = ["A320", "B190", "B747", "CRJ9", "B737"]
+# Lowest altitude, highest altitude - 10
+ALTITUDE_RANGE: tuple[int, int] = (90, 290)
 
-PPS_SIDE = 10
-RADIUS = 270
+HEADING_RANGE: tuple[float, float] = (0, 179.9999)
+
+PPS_SIDE: int = 10
+RADIUS: int = 270
 
 
 class PenUp:
     """
     Context manager for movements during which time pen should be up.
     """
-    def __enter__(self):
+
+    def __enter__(self) -> "PenUp":
         turtle.penup()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         turtle.pendown()
 
 
@@ -30,14 +35,17 @@ class KeepPos:
     """
     Context manager for storing pen position and returning to it at exit.
     """
-    def __init__(self):
-        self.x, self.y = turtle.position()
-        self.heading = turtle.heading()
+    x: float
+    y: float
 
-    def __enter__(self):
+    def __init__(self) -> None:
+        self.x, self.y = turtle.position()
+        self.heading: float = turtle.heading()
+
+    def __enter__(self) -> "Keep Pos":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         with PenUp():
             turtle.goto(self.x, self.y)
             turtle.setheading(self.heading)
@@ -47,32 +55,29 @@ def random_altitudes() -> tuple[str, str]:
     """
     Return two altitudes for pps displays.
     """
-    alt_range = (90, 290)
-    a = random.randrange(*alt_range, step=10)
+    a = random.randrange(*ALTITUDE_RANGE, step=10)
     b = a + 10
     return f"{a:03d}", f"{b:03d}"
 
 
 def random_acid() -> str:
-    callsign = random.choice(CALLSIGNS)
-    number = str(random.randint(100, 999))
-    return callsign + number
+    callsign: str = random.choice(CALLSIGNS)
+    percentage_of_4_digit_flight_numbers = 0.1
+
+    if random.uniform(0, 1) < percentage_of_4_digit_flight_numbers:
+        number: int = random.randint(1000, 9999)
+    else:
+        number: int = random.randint(100, 999)
+
+    return callsign + str(number)
 
 
-def line_headings() -> tuple[float, float]:
-    """
-    Return two random headings modulo 180.
-    """
-    heading_range = 0, 179.9999
-    heading_0 = random.uniform(*heading_range)
-    heading_1 = random.uniform(*heading_range)
-    return heading_0, heading_1
-
-
-def generate_aircraft(heading_0, heading_1) -> tuple[namedtuple, namedtuple]:
+def generate_aircraft(heading_0: float, heading_1: float) -> tuple[namedtuple, namedtuple]:
     alt_0, alt_1 = random_altitudes()
-    craft_0 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES), heading=heading_0, altitude=alt_0)
-    craft_1 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES), heading=heading_1, altitude=alt_1)
+    craft_0 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES),
+                       heading=heading_0, altitude=alt_0, speed=25)
+    craft_1 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES),
+                       heading=heading_1, altitude=alt_1, speed=25)
     return craft_0, craft_1
 
 
@@ -96,41 +101,42 @@ def draw_lines(heading_0, heading_1) -> None:
                 turtle.setheading(heading)
                 turtle.forward(RADIUS)
             turtle.backward(2 * RADIUS)
-    return heading_0, heading_1
 
 
-def place_pps(aircraft: tuple) -> None:
+def place_pps(aircraft_list: tuple) -> None:
     """
     Place a PPS on each of the lines defined by two-member tuple of
     Aircraft at the same distance from the centre.
     """
-    distance = random.randint(30, 170)
+    distance = random.randint(40, 170)
     parities = [1, -1]
     parity = random.choice(parities)
-    for i, craft in enumerate(aircraft):
+    for i, aircraft in enumerate(aircraft_list):
         if i == 1:
-            if abs(aircraft[0].heading - aircraft[1].heading) <= 20:
+            if abs(aircraft_list[0].heading - aircraft_list[1].heading) <= 30:
                 parity = 1 if parity == -1 else -1
             else:
                 parity = random.choice(parities)
         with KeepPos():
-            modded_distance = parity * distance
+            modified_distance = parity * distance
             with PenUp():
-                turtle.setheading(craft.heading)
-                turtle.forward(modded_distance)
-            text = f"{craft.acid}\n" \
-                   f"{craft.type}\n" \
-                   f"{craft.altitude}    25"
+                turtle.setheading(aircraft.heading)
+                turtle.forward(modified_distance)
+            tag = f"{aircraft.acid}\n" \
+                  f"{aircraft.type}\n" \
+                  f"{aircraft.altitude}    {aircraft.speed}"
             draw_pps()
             with PenUp():
                 turtle.forward(parity * (RADIUS / 4))
-                turtle.write(text)
+                turtle.write(tag)
 
 
 def draw_pps() -> None:
     """
     Draw a PSR/SSR Correlated PPS at current position.
     """
+    triangle_side = PPS_SIDE * sqrt(3)
+
     with KeepPos():
 
         with PenUp():
@@ -145,10 +151,13 @@ def draw_pps() -> None:
         triangle_angles = (150, 270, 30)
         for angle in triangle_angles:
             turtle.setheading(angle)
-            turtle.forward(PPS_SIDE * sqrt(3))
+            turtle.forward(triangle_side)
 
 
-def init() -> None:
+def initialize() -> None:
+    """
+    Set up turtle for drawing what's needed.
+    """
     turtle.mode('logo')
     turtle.hideturtle()
     turtle.speed(0)
@@ -156,21 +165,27 @@ def init() -> None:
 
 
 def reset() -> None:
+    """
+    Clear the screen and put the pen back at the origin.
+    """
     turtle.clear()
     turtle.setheading(360)
     turtle.home()
 
 
 def draw(*args) -> None:
+    """
+    Draw the radar, heading lines, and PPS (with data tags).
+    """
     reset()
     draw_circle()
-    headings = line_headings()
+    headings = random.uniform(*HEADING_RANGE), random.uniform(*HEADING_RANGE)
     draw_lines(*headings)
     place_pps(generate_aircraft(*headings))
 
 
 def main() -> None:
-    init()
+    initialize()
     draw()
 
 
