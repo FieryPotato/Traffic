@@ -6,10 +6,11 @@ from math import sqrt
 
 Aircraft: namedtuple = namedtuple("Aircraft", "acid, type, heading, altitude, speed")
 
-CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA", "WJA",
-                        "UAL", "CRQ", "DAL", "GLR"]
+CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA",
+                        "WJA", "UAL", "CRQ", "DAL", "GLR", "DLH", "AFR"]
 
-PLANE_TYPES: list[str] = ["A320", "B190", "B747", "CRJ9", "B737"]
+PLANE_TYPES: list[str] = ["A320", "B190", "B747", "CRJ9", "B737", "C500",
+                          "A340", "GLF5", "E190", "DH8C", "C208", "BE9L"]
 
 # Lowest altitude, highest altitude - 10
 ALTITUDE_RANGE: tuple[int, int] = (90, 290)
@@ -21,38 +22,6 @@ PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
 SMALLEST_SAME_HEADING_ANGLE = 30
-
-
-class PenUp:
-    """
-    Context manager to automate putting pen up and down for movement.
-    """
-    def __enter__(self) -> "PenUp":
-        turtle.penup()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        turtle.pendown()
-
-
-class KeepPos:
-    """
-    Context manager for storing pen position and returning to it at exit.
-    """
-    x: float
-    y: float
-
-    def __init__(self) -> None:
-        self.x, self.y = turtle.position()
-        self.heading: float = turtle.heading()
-
-    def __enter__(self) -> "Keep Pos":
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        with PenUp():
-            turtle.goto(self.x, self.y)
-            turtle.setheading(self.heading)
 
 
 def random_altitudes() -> tuple[str, str]:
@@ -228,6 +197,38 @@ def draw(*args) -> None:
 def main() -> None:
     initialize()
     draw()
+
+
+class PenUp:
+    """
+    Context manager to automate putting pen up and down for movement.
+    """
+    def __enter__(self) -> "PenUp":
+        turtle.penup()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        turtle.pendown()
+
+
+class KeepPos:
+    """
+    Context manager for storing pen position and returning to it at exit.
+    """
+    x: float
+    y: float
+
+    def __init__(self) -> None:
+        self.x, self.y = turtle.position()
+        self.heading: float = turtle.heading()
+
+    def __enter__(self) -> "Keep Pos":
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        with PenUp():
+            turtle.goto(self.x, self.y)
+            turtle.setheading(self.heading)
 
 
 if __name__ == '__main__':
