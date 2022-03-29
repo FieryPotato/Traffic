@@ -3,6 +3,7 @@ import random
 from collections import namedtuple
 from math import sqrt
 
+
 Aircraft: namedtuple = namedtuple("Aircraft", "acid, type, heading, altitude, speed")
 
 CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA", "WJA",
@@ -19,6 +20,7 @@ PARITIES = [1, -1]
 PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
+SMALLEST_SAME_HEADING_ANGLE = 30
 
 
 class PenUp:
@@ -117,8 +119,12 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
     parity = random.choice(PARITIES)
 
     for i, aircraft in enumerate(aircraft_list):
+
+        # Prevent PPS from being too close to each other by preventing same-
+        # parity when the angles are too similar.
+        heading_angle = abs(aircraft_list[0].heading - aircraft_list[1].heading)
         if i == 1:
-            if abs(aircraft_list[0].heading - aircraft_list[1].heading) <= 30:
+            if heading_angle < SMALLEST_SAME_HEADING_ANGLE:
                 parity = 1 if parity == -1 else -1
             else:
                 parity = random.choice(PARITIES)
