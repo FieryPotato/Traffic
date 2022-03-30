@@ -22,6 +22,7 @@ PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
 SMALLEST_SAME_HEADING_ANGLE = 30
+PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS = 0.1
 
 
 def random_altitudes() -> tuple[str, str]:
@@ -35,9 +36,8 @@ def random_altitudes() -> tuple[str, str]:
 
 def random_acid() -> str:
     callsign: str = random.choice(CALLSIGNS)
-    percentage_of_4_digit_flight_numbers = 0.1
 
-    if random.uniform(0, 1) < percentage_of_4_digit_flight_numbers:
+    if random.uniform(0, 1) < PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS:
         number: int = random.randint(0000, 9999)
     else:
         number: int = random.randint(000, 999)
