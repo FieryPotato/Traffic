@@ -38,9 +38,9 @@ def random_acid() -> str:
     percentage_of_4_digit_flight_numbers = 0.1
 
     if random.uniform(0, 1) < percentage_of_4_digit_flight_numbers:
-        number: int = random.randint(1000, 9999)
+        number: int = random.randint(0000, 9999)
     else:
-        number: int = random.randint(100, 999)
+        number: int = random.randint(000, 999)
 
     return callsign + str(number)
 
