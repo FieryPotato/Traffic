@@ -89,7 +89,7 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
 
     for i, aircraft in enumerate(aircraft_list):
 
-        # Prevent PPS from being too close to each other by preventing same-
+        # Prevent PPS from being too close to each other by preventing same
         # parity when the angles are too similar.
         heading_angle = abs(aircraft_list[0].heading - aircraft_list[1].heading)
         if i == 1:
@@ -119,7 +119,6 @@ def draw_pps() -> None:
     """
     Draw a PSR/SSR Correlated PPS at current position.
     """
-    triangle_side = PPS_SIDE * sqrt(3)
 
     with KeepPos():
 
@@ -127,15 +126,23 @@ def draw_pps() -> None:
             turtle.setheading(360)
             turtle.forward(PPS_SIDE)
 
-        hexagon_angles = (120, 180, 240, 300, 360, 60)
-        for angle in hexagon_angles:
-            turtle.setheading(angle)
-            turtle.forward(PPS_SIDE)
+        draw_hexagon()
+        draw_triangle()
 
-        triangle_angles = (150, 270, 30)
-        for angle in triangle_angles:
-            turtle.setheading(angle)
-            turtle.forward(triangle_side)
+
+def draw_triangle():
+    triangle_angles = (150, 270, 30)
+    triangle_side = PPS_SIDE * sqrt(3)
+    for angle in triangle_angles:
+        turtle.setheading(angle)
+        turtle.forward(triangle_side)
+
+
+def draw_hexagon():
+    hexagon_angles = (120, 180, 240, 300, 360, 60)
+    for angle in hexagon_angles:
+        turtle.setheading(angle)
+        turtle.forward(PPS_SIDE)
 
 
 def draw_scale() -> None:
@@ -184,7 +191,7 @@ def reset() -> None:
 
 def draw(*args) -> None:
     """
-    Draw the radar, heading lines, and PPS (with data tags).
+    Draw the radar, heading lines, PPS (with data tags) and scale.
     """
     with UnbindTurtle():
         reset()
