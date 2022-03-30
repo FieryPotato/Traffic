@@ -186,12 +186,13 @@ def draw(*args) -> None:
     """
     Draw the radar, heading lines, and PPS (with data tags).
     """
-    reset()
-    draw_circle()
-    headings = random.uniform(*HEADING_RANGE), random.uniform(*HEADING_RANGE)
-    draw_lines(*headings)
-    place_pps(generate_aircraft(*headings))
-    draw_scale()
+    with UnbindTurtle():
+        reset()
+        draw_circle()
+        headings = random.uniform(*HEADING_RANGE), random.uniform(*HEADING_RANGE)
+        draw_lines(*headings)
+        place_pps(generate_aircraft(*headings))
+        draw_scale()
 
 
 def main() -> None:
@@ -229,6 +230,18 @@ class KeepPos:
         with PenUp():
             turtle.goto(self.x, self.y)
             turtle.setheading(self.heading)
+
+
+class UnbindTurtle:
+    """
+    Context manager to automate unbinding and rebinding for draw().
+    """
+    def __enter__(self) -> "UnbindTurtle":
+        turtle.onscreenclick(None)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        turtle.onscreenclick(draw)
 
 
 if __name__ == '__main__':
