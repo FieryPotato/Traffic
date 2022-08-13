@@ -4,32 +4,28 @@ from collections import namedtuple
 from math import sqrt
 
 
-Aircraft: namedtuple = namedtuple("Aircraft", "acid, type, heading, altitude, speed")
+Aircraft: namedtuple = namedtuple('Aircraft', 'acid, type, heading, altitude, speed')
 
-CALLSIGNS: list[str] = ["ACA", "BAW", "GGN", "NCB", "NWT", "CFC", "JZA",
-                        "WJA", "UAL", "CRQ", "DAL", "GLR", "DLH", "AFR"]
+CALLSIGNS: list[str] = ['ACA', 'BAW', 'GGN', 'NCB', 'NWT', 'CFC', 'JZA',
+                        'WJA', 'UAL', 'CRQ', 'DAL', 'GLR', 'DLH', 'AFR']
 
-PLANE_TYPES: list[str] = ["A320", "B190", "B747", "CRJ9", "B737", "C500",
-                          "A340", "GLF5", "E190", "DH8C", "C208", "BE9L"]
+PLANE_TYPES: list[str] = ['A320', 'B190', 'B747', 'CRJ9', 'B737', 'C500',
+                          'A340', 'GLF5', 'E190', 'DH8C', 'C208', 'BE9L']
 
 # Lowest altitude, highest altitude - 10
 ALTITUDE_RANGE: tuple[int, int] = (90, 290)
 
 HEADING_RANGE: tuple[float, float] = (0, 179.9999)
 
+FONT = ['Arial', 12, 'normal']
+
 PARITIES = [1, -1]
 PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
 SMALLEST_SAME_HEADING_ANGLE = 30
-<<<<<<< HEAD
-TICK_LENGTH = 10
-
-percentage_of_4_digit_flight_numbers = 0.3
-
-=======
-PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS = 0.1
->>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
+SCALE_BRACKET_TICK_LENGTH = 10
+PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS = 0.3
 
 
 def random_altitudes() -> tuple[str, str]:
@@ -38,7 +34,7 @@ def random_altitudes() -> tuple[str, str]:
     """
     a = random.randrange(*ALTITUDE_RANGE, step=10)
     b = a + 10
-    return f"{a:03d}", f"{b:03d}"
+    return f'{a:03d}', f'{b:03d}'
 
 
 def random_acid() -> str:
@@ -48,12 +44,10 @@ def random_acid() -> str:
     callsign: str = random.choice(CALLSIGNS)
 
     if random.uniform(0, 1) < PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS:
-        number: int = random.randint(0000, 9999)
+        number: str = f'{random.randint(0000, 9999):04d}'
     else:
-        number: int = random.randint(000, 999)
-
-    return callsign + str(number)
-
+        number: str = f'{random.randint(000, 999):03d}' 
+    return callsign + number
 
 def generate_aircraft(heading_0: float, heading_1: float) -> tuple[namedtuple, namedtuple]:
     """
@@ -122,13 +116,13 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
 
             draw_pps()
 
-            tag = f"{aircraft.acid}\n" \
-                  f"{aircraft.type}\n" \
-                  f"{aircraft.altitude}    {aircraft.speed}"
+            tag = f'{aircraft.acid}\n' \
+                  f'{aircraft.type}\n' \
+                  f'{aircraft.altitude}    {aircraft.speed}'
 
             with PenUp():
                 turtle.forward(parity * (RADIUS / 4))
-                turtle.write(tag)
+                turtle.write(tag, font=FONT)
 
 
 def draw_hexagon() -> None:
@@ -145,14 +139,11 @@ def draw_triangle() -> None:
     """
     Draw a triangle at current position.
     """
-<<<<<<< HEAD
     triangle_side = PPS_SIDE * sqrt(3)
     triangle_angles = (150, 270, 30)
     for angle in triangle_angles:
         turtle.setheading(angle)
         turtle.forward(triangle_side)
-=======
->>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
 
 
 def draw_pps() -> None:
@@ -169,32 +160,15 @@ def draw_pps() -> None:
         draw_triangle()
 
 
-<<<<<<< HEAD
 def draw_scale_bracket() -> None:
     """
     Draw a bracket shape.
     """
-    turtle.forward(TICK_LENGTH)
+    turtle.forward(SCALE_BRACKET_TICK_LENGTH)
     turtle.setheading(90)
     turtle.forward(MILE_LENGTH)
     turtle.setheading(180)
     turtle.forward(SCALE_BRACKET_TICK_LENGTH)
-
-=======
-def draw_triangle():
-    triangle_angles = (150, 270, 30)
-    triangle_side = PPS_SIDE * sqrt(3)
-    for angle in triangle_angles:
-        turtle.setheading(angle)
-        turtle.forward(triangle_side)
-
-
-def draw_hexagon():
-    hexagon_angles = (120, 180, 240, 300, 360, 60)
-    for angle in hexagon_angles:
-        turtle.setheading(angle)
-        turtle.forward(PPS_SIDE)
->>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
 
 
 def draw_scale() -> None:
@@ -213,7 +187,7 @@ def draw_scale() -> None:
         with PenUp():
             turtle.goto(scale_start[0] + MILE_LENGTH / 2, scale_start[1] + 10)
 
-        turtle.write("1 MILE", align="center")
+        turtle.write('1 MILE', align='center', font=FONT)
 
 
 def initialize() -> None:
@@ -257,7 +231,7 @@ class PenUp:
     """
     Context manager to automate putting pen up and down for movement.
     """
-    def __enter__(self) -> "PenUp":
+    def __enter__(self) -> 'PenUp':
         turtle.penup()
         return self
 
@@ -276,7 +250,7 @@ class KeepPos:
         self.x, self.y = turtle.position()
         self.heading: float = turtle.heading()
 
-    def __enter__(self) -> "Keep Pos":
+    def __enter__(self) -> 'Keep Pos':
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
@@ -289,7 +263,7 @@ class UnbindTurtle:
     """
     Context manager to automate unbinding and rebinding for draw().
     """
-    def __enter__(self) -> "UnbindTurtle":
+    def __enter__(self) -> 'UnbindTurtle':
         turtle.onscreenclick(None)
         return self
 
