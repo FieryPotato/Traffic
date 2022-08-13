@@ -22,6 +22,10 @@ PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
 SMALLEST_SAME_HEADING_ANGLE = 30
+TICK_LENGTH = 10
+
+percentage_of_4_digit_flight_numbers = 0.3
+
 
 
 def random_altitudes() -> tuple[str, str]:
@@ -34,8 +38,10 @@ def random_altitudes() -> tuple[str, str]:
 
 
 def random_acid() -> str:
+    """
+    Return a random aircraft id.
+    """
     callsign: str = random.choice(CALLSIGNS)
-    percentage_of_4_digit_flight_numbers = 0.1
 
     if random.uniform(0, 1) < percentage_of_4_digit_flight_numbers:
         number: int = random.randint(1000, 9999)
@@ -46,6 +52,9 @@ def random_acid() -> str:
 
 
 def generate_aircraft(heading_0: float, heading_1: float) -> tuple[namedtuple, namedtuple]:
+    """
+    Return two randomly generated aircraft.
+    """
     alt_0, alt_1 = random_altitudes()
 
     craft_0 = Aircraft(acid=random_acid(), type=random.choice(PLANE_TYPES),
@@ -92,14 +101,17 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
         # Prevent PPS from being too close to each other by preventing same-
         # parity when the angles are too similar.
         heading_angle = abs(aircraft_list[0].heading - aircraft_list[1].heading)
-        if i == 1:
+        if i == 1:  # Only apply prevention if the first aircraft's 
+                    # parity is already known.
             if heading_angle < SMALLEST_SAME_HEADING_ANGLE:
                 parity = 1 if parity == -1 else -1
             else:
                 parity = random.choice(PARITIES)
 
         with KeepPos():
+           
             modified_distance = parity * distance
+            
             with PenUp():
                 turtle.setheading(aircraft.heading)
                 turtle.forward(modified_distance)
@@ -115,47 +127,65 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
                 turtle.write(tag)
 
 
+def draw_hexagon() -> None:
+    """
+    Draw a hexagon at current position.
+    """
+    hexagon_angles = (120, 180, 240, 300, 360, 60)
+    for angle in hexagon_angles:
+        turtle.setheading(angle)
+        turtle.forward(PPS_SIDE)
+
+
+def draw_triangle() -> None:
+    """
+    Draw a triangle at current position.
+    """
+    triangle_side = PPS_SIDE * sqrt(3)
+    triangle_angles = (150, 270, 30)
+    for angle in triangle_angles:
+        turtle.setheading(angle)
+        turtle.forward(triangle_side)
+
+
 def draw_pps() -> None:
     """
     Draw a PSR/SSR Correlated PPS at current position.
     """
-    triangle_side = PPS_SIDE * sqrt(3)
-
     with KeepPos():
 
         with PenUp():
             turtle.setheading(360)
             turtle.forward(PPS_SIDE)
 
-        hexagon_angles = (120, 180, 240, 300, 360, 60)
-        for angle in hexagon_angles:
-            turtle.setheading(angle)
-            turtle.forward(PPS_SIDE)
+        draw_hexagon()
+        draw_triangle()
 
-        triangle_angles = (150, 270, 30)
-        for angle in triangle_angles:
-            turtle.setheading(angle)
-            turtle.forward(triangle_side)
+
+def draw_scale_bracket() -> None:
+    """
+    Draw a bracket shape.
+    """
+    turtle.forward(TICK_LENGTH)
+    turtle.setheading(90)
+    turtle.forward(MILE_LENGTH)
+    turtle.setheading(180)
+    turtle.forward(SCALE_BRACKET_TICK_LENGTH)
+
 
 
 def draw_scale() -> None:
     """
     Draw a scale for 1 mile.
     """
-    tick_length = 10
     scale_start = (-RADIUS, RADIUS)
 
     with KeepPos():
         with PenUp():
             turtle.goto(scale_start)
             turtle.setheading(360)
-
-        # draw the bracket shape
-        turtle.forward(tick_length)
-        turtle.setheading(90)
-        turtle.forward(MILE_LENGTH)
-        turtle.setheading(180)
-        turtle.forward(tick_length)
+    
+        draw_scale_bracket()
 
         with PenUp():
             turtle.goto(scale_start[0] + MILE_LENGTH / 2, scale_start[1] + 10)
