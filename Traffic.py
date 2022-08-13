@@ -22,10 +22,14 @@ PPS_SIDE: int = 10
 RADIUS: int = 270
 MILE_LENGTH: int = 40
 SMALLEST_SAME_HEADING_ANGLE = 30
+<<<<<<< HEAD
 TICK_LENGTH = 10
 
 percentage_of_4_digit_flight_numbers = 0.3
 
+=======
+PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS = 0.1
+>>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
 
 
 def random_altitudes() -> tuple[str, str]:
@@ -43,10 +47,10 @@ def random_acid() -> str:
     """
     callsign: str = random.choice(CALLSIGNS)
 
-    if random.uniform(0, 1) < percentage_of_4_digit_flight_numbers:
-        number: int = random.randint(1000, 9999)
+    if random.uniform(0, 1) < PERCENTAGE_OF_4_DIGIT_FLIGHT_NUMBERS:
+        number: int = random.randint(0000, 9999)
     else:
-        number: int = random.randint(100, 999)
+        number: int = random.randint(000, 999)
 
     return callsign + str(number)
 
@@ -98,7 +102,7 @@ def place_pps(aircraft_list: tuple[Aircraft, Aircraft]) -> None:
 
     for i, aircraft in enumerate(aircraft_list):
 
-        # Prevent PPS from being too close to each other by preventing same-
+        # Prevent PPS from being too close to each other by preventing same
         # parity when the angles are too similar.
         heading_angle = abs(aircraft_list[0].heading - aircraft_list[1].heading)
         if i == 1:  # Only apply prevention if the first aircraft's 
@@ -141,11 +145,14 @@ def draw_triangle() -> None:
     """
     Draw a triangle at current position.
     """
+<<<<<<< HEAD
     triangle_side = PPS_SIDE * sqrt(3)
     triangle_angles = (150, 270, 30)
     for angle in triangle_angles:
         turtle.setheading(angle)
         turtle.forward(triangle_side)
+=======
+>>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
 
 
 def draw_pps() -> None:
@@ -162,6 +169,7 @@ def draw_pps() -> None:
         draw_triangle()
 
 
+<<<<<<< HEAD
 def draw_scale_bracket() -> None:
     """
     Draw a bracket shape.
@@ -172,6 +180,21 @@ def draw_scale_bracket() -> None:
     turtle.setheading(180)
     turtle.forward(SCALE_BRACKET_TICK_LENGTH)
 
+=======
+def draw_triangle():
+    triangle_angles = (150, 270, 30)
+    triangle_side = PPS_SIDE * sqrt(3)
+    for angle in triangle_angles:
+        turtle.setheading(angle)
+        turtle.forward(triangle_side)
+
+
+def draw_hexagon():
+    hexagon_angles = (120, 180, 240, 300, 360, 60)
+    for angle in hexagon_angles:
+        turtle.setheading(angle)
+        turtle.forward(PPS_SIDE)
+>>>>>>> f8965d83e6bb422c2e9fe2006a83425c0c1b7970
 
 
 def draw_scale() -> None:
@@ -214,7 +237,7 @@ def reset() -> None:
 
 def draw(*args) -> None:
     """
-    Draw the radar, heading lines, and PPS (with data tags).
+    Draw the radar, heading lines, PPS (with data tags) and scale.
     """
     with UnbindTurtle():
         reset()
